@@ -7,6 +7,7 @@ import (
 	"github.com/oschwald/geoip2-golang"
 	"github.com/sirupsen/logrus"
 	"net"
+	"strings"
 	"time"
 )
 
@@ -153,6 +154,9 @@ func (server *DNServer) LookupNetwork(request *dns.Msg, network string) (*dns.Ms
 		upstreamDNS := server.config.PrimaryDNS
 		if useSecondary {
 			upstreamDNS = server.config.SecondaryDNS
+		}
+		if !strings.Contains(upstreamDNS, ":") {
+			upstreamDNS += ":53"
 		}
 
 		response, err := resolve(request, upstreamDNS, network)
