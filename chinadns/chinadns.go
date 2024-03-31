@@ -14,6 +14,7 @@ type ServerConfig struct {
 	PrimaryDNS   string
 	SecondaryDNS string
 	ListenAddr   string
+	CacheSize    int
 }
 
 type DNServer struct {
@@ -72,12 +73,12 @@ func NewDNServer(cfg ServerConfig) (*DNServer, error) {
 	}
 
 	var err error
-	server.chinaDomainCache, err = goc.NewCache("lru", 1024*20)
+	server.chinaDomainCache, err = goc.NewCache("lru", server.config.CacheSize)
 	if err != nil {
 		logger.Fatalln(err)
 	}
 
-	server.responseCache, err = goc.NewCache("lru", 1024*20)
+	server.responseCache, err = goc.NewCache("lru", server.config.CacheSize)
 	if err != nil {
 		logger.Fatalln(err)
 	}

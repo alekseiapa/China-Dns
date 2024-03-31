@@ -24,5 +24,6 @@ func loadServerConfig() chinadns.ServerConfig {
 		PrimaryDNS:   "8.8.8.8",
 		SecondaryDNS: "8.8.4.4",
 		ListenAddr:   "127.0.0.1:53",
+		CacheSize:    1024 * 20,
 	}
 }
