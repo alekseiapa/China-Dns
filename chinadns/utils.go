@@ -2,7 +2,8 @@ package chiandns
 
 import (
 	"github.com/miekg/dns"
-	"net"
+	"strconv"
+	"strings"
 )
 
 func createServerFailureResponse(request *dns.Msg) *dns.Msg {
@@ -41,15 +42,39 @@ func containsChinaIP(response *dns.Msg) bool {
 	}
 	return false
 }
-func isChinaIP(ip string) bool {
-	record, err := geoIPDB.Country(net.ParseIP(ip))
-	if err != nil {
-		logger.Error(err)
-		return false
+
+func IPToInteger(ip string) int {
+	var parts = strings.Split(ip, ".")
+	if len(parts) < 4 {
+		return 0
 	}
-	return record.Country.IsoCode == "CN"
+
+	a, _ := strconv.Atoi(parts[0])
+	b, _ := strconv.Atoi(parts[1])
+	c, _ := strconv.Atoi(parts[2])
+	d, _ := strconv.Atoi(parts[3])
+
+	return (a << 24) | (b << 16) | (c << 8) | d
 }
 
+func isChinaIP(ip string) bool {
+	ipInt := IPToInteger(ip)
+	left := 0
+	right := len(chinaIPs) - 1
+
+	for left <= right {
+		mid := left + (right-left)/2
+		if ipInt < chinaIPs[mid][0] {
+			right = mid - 1
+		} else if ipInt > chinaIPs[mid][1] {
+			left = mid + 1
+		} else {
+			return true
+		}
+	}
+
+	return false
+}
 func generateCacheKey(request *dns.Msg, network string) string {
 	query := request.Question[0]
 	key := query.Name + "_" + dns.TypeToString[query.Qtype]

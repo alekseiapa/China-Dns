@@ -36,12 +36,14 @@ var logger = loggerconfig.NewLogger()
 
 const minimumTTL = 60
 
+var chinaIPs [][]int
+
 func init() {
-	var err error
-	geoIPDB, err = geoip2.Open("GeoLite2-Country.mmdb")
+	err := loadChinaIPs(ipListURL, &chinaIPs)
 	if err != nil {
-		logger.Fatalln(err)
+		logger.Fatalf("Failed to load China IPs: %v\n", err)
 	}
+	logger.Info("Loaded China IPs from URL: %v", ipListURL)
 }
 
 func (e DNServerError) Error() string {
