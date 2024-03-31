@@ -87,17 +87,31 @@ func NewDNServer(cfg ServerConfig) (*DNServer, error) {
 
 func (server *DNServer) Start() error {
 	errorChannel := make(chan error, 2)
+	doneChannel := make(chan struct{})
+	var firstError error
 
 	for _, dnsServer := range server.dnsServers {
 		go func(ds *dns.Server) {
-			errorChannel <- ds.ListenAndServe()
+			if err := ds.ListenAndServe(); err != nil {
+				errorChannel <- err
+			}
+			doneChannel <- struct{}{}
 		}(dnsServer)
 	}
 
-	select {
-	case err := <-errorChannel:
-		return err
+	var doneCount int
+	for doneCount < 2 {
+		select {
+		case err := <-errorChannel:
+			if err != nil && firstError == nil {
+				firstError = err
+			}
+		case <-doneChannel:
+			doneCount++
+		}
 	}
+
+	return firstError
 }
 
 func (server *DNServer) handleDNSRequest(writer dns.ResponseWriter, request *dns.Msg, network string) {
