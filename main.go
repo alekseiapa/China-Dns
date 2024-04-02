@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	chinadns "github.com/alekseiapa/China-Dns/chinadns"
 	"github.com/alekseiapa/China-Dns/loggerconfig"
 )
@@ -20,10 +21,19 @@ func main() {
 
 // loadServerConfig loads the server configuration.
 func loadServerConfig() chinadns.ServerConfig {
-	return chinadns.ServerConfig{
-		PrimaryDNS:   "8.8.8.8",
-		SecondaryDNS: "8.8.4.4",
-		ListenAddr:   "127.0.0.1:53",
-		CacheSize:    1024 * 20,
+	primaryDNS := flag.String("primarydns", "8.8.8.8", "Primary DNS server address")
+	secondaryDNS := flag.String("secondarydns", "8.8.4.4", "Secondary DNS server address")
+	listenAddr := flag.String("listenaddr", "127.0.0.1:53", "DNS server listen address")
+	cacheSize := flag.Int("cachesize", 1024*20, "Size of cache")
+
+	flag.Parse()
+
+	config := chinadns.ServerConfig{
+		PrimaryDNS:   *primaryDNS,
+		SecondaryDNS: *secondaryDNS,
+		ListenAddr:   *listenAddr,
+		CacheSize:    *cacheSize,
 	}
+
+	return config
 }
