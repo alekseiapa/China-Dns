@@ -1,0 +1,40 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.bin
+*.o
+*.a
+
+# Output of the go coverage tool
+*.out
+
+# Dependency directories (remove -vendor if your project needs it)
+vendor/
+
+# Dependency files
+Gopkg.lock
+Gopkg.toml
+go.sum
+
+# Configuration files specific to an IDE or an editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# macOS specific files
+.DS_Store
+
+# Log files
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# Compiled files and folders
+bin/
+obj/
